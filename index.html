@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Probability Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        /* Mobile responsive styles */
+        @media (max-width: 640px) {
+            body {
+                font-size: 14px;
+            }
+            header {
+                padding: 12px 8px !important;
+            }
+            .message-enter {
+                width: 95% !important;
+                padding: 12px !important;
+            }
+            #userInput {
+                padding: 10px 36px 10px 10px !important;
+                font-size: 14px;
+            }
+            #sendButton {
+                right: 8px !important;
+                top: 8px !important;
+            }
+        }
+        .quantum-pulse {
+            animation: pulse 2s infinite;
+        }
+        .console-bg {
+            background-color: #000000;
+        }
+        .glow-text {
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.7);
+        }
+        .message-enter {
+            animation: fadeIn 0.5s ease-in;
+            width: 90%;
+            max-width: 800px;
+            word-break: break-word;
+            margin-bottom: 1.5rem;
+        }
+        .typing-animation {
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: bottom;
+        }
+        #chatContainer {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background-color: #1a2e05;
+            border-radius: 2px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4ade80;
+            border-radius: 2px;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body class="font-mono text-green-400 bg-black min-h-screen flex flex-col">
+    <div class="console-bg flex-grow flex flex-col">
+        <!-- Header -->
+        <header class="border-b border-green-800/50 p-4 flex flex-col items-center text-center">
+            <h1 class="text-xl md:text-2xl font-bold glow-text">Quantizer</h1>
+            <p class="text-xs md:text-sm text-green-300 opacity-80">v1.3.7 - Quantum Core Online</p>
+            <div class="flex items-center space-x-4">
+                <button id="langToggle" class="px-3 py-1 bg-green-900/50 hover:bg-green-800/70 rounded text-sm border border-green-700/50 transition">
+                    <span class="en">EN</span>
+                    <span class="ru hidden">RU</span>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-2 h-2 rounded-full bg-green-500 mr-1 quantum-pulse"></div>
+                        <span class="text-xs">Q-System</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-2 h-2 rounded-full bg-blue-500 mr-1 quantum-pulse" style="animation-delay: 0.3s"></div>
+                        <span class="text-xs">Q-Entanglement</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-2 h-2 rounded-full bg-purple-500 mr-1 quantum-pulse" style="animation-delay: 0.6s"></div>
+                        <span class="text-xs">Q-Coherence</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-2 h-2 rounded-full bg-yellow-500 mr-1 quantum-pulse" style="animation-delay: 0.9s"></div>
+                        <span class="text-xs">Q-Superposition</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-4 overflow-y-auto flex flex-col items-center" id="chatContainer">
+            <!-- Welcome Message -->
+            <div class="message-enter mb-6 p-4 border border-green-800/50 rounded-lg bg-black/30 backdrop-blur-sm w-full max-w-2xl">
+                <div class="flex items-start mb-2">
+                    <div class="w-8 h-8 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                        <i class="fas fa-atom text-green-400"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-green-300">Quantum Universe</p>
+                        <div class="text-sm">
+                            <p class="en">Welcome to the Quantum Probability Interface. Ask any question about future events and our quantum computer will calculate the probability based on current quantum state superposition.</p>
+                            <p class="ru hidden">Добро пожаловать в Квантовый Интерфейс Вероятностей. Задайте любой вопрос о будущих событиях, и наш квантовый компьютер рассчитает вероятность на основе текущей суперпозиции квантовых состояний.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-green-900/10 border border-green-800/50 rounded">
+                    <p class="text-xs mb-2 en">Example questions:</p>
+                    <p class="text-xs mb-2 ru hidden">Примеры вопросов:</p>
+                    <ul class="text-xs space-y-1">
+                        <li class="en">• Will I get a promotion this year?</li>
+                        <li class="ru hidden">• Получу ли я повышение в этом году?</li>
+                        <li class="en">• What are the chances of rain tomorrow?</li>
+                        <li class="ru hidden">• Каковы шансы на дождь завтра?</li>
+                        <li class="en">• Will my startup succeed?</li>
+                        <li class="ru hidden">• Будет ли успешным мой стартап?</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t border-green-800/50">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Ask the quantum universe..." 
+                    class="en w-full p-3 pr-12 bg-black/50 border border-green-800/50 rounded-lg text-green-300 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition"
+                    placeholder-ru="Спросите квантовую вселенную..." 
+                    class-ru="hidden"
+                >
+                <button id="sendButton" class="absolute right-3 top-3 text-green-400 hover:text-green-300 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            <p class="text-xs text-green-500/70 mt-2 text-center en">Press Enter to submit your quantum query</p>
+            <p class="text-xs text-green-500/70 mt-2 text-center ru hidden">Нажмите Enter для отправки квантового запроса</p>
+        </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center text-[10px] text-green-500/30 pb-1 pt-1">
+        <p class="en">For entertainment purposes only. Developer: <a href="https://kwork.ru/user/nikita-belousow" target="_blank" class="hover:text-green-400 transition">Nikita Belousov</a></p>
+        <p class="ru hidden">Только для развлекательных целей. Разработчик: <a href="https://kwork.ru/user/nikita-belousow" target="_blank" class="hover:text-green-400 transition">Nikita Belousov</a></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const langToggle = document.getElementById('langToggle');
+            
+            let currentLang = 'en';
+            
+            // Toggle language
+            langToggle.addEventListener('click', function() {
+                currentLang = currentLang === 'en' ? 'ru' : 'en';
+                
+                // Toggle visibility of language-specific elements
+                document.querySelectorAll('.en').forEach(el => {
+                    el.classList.toggle('hidden', currentLang !== 'en');
+                });
+                document.querySelectorAll('.ru').forEach(el => {
+                    el.classList.toggle('hidden', currentLang !== 'ru');
+                });
+                
+                // Update placeholder
+                if (currentLang === 'en') {
+                    userInput.placeholder = 'Ask the quantum universe...';
+                    userInput.classList.remove('hidden');
+                    userInput.classList.add('en');
+                    userInput.classList.remove('ru');
+                } else {
+                    userInput.placeholder = 'Спросите квантовую вселенную...';
+                    userInput.classList.remove('hidden');
+                    userInput.classList.remove('en');
+                    userInput.classList.add('ru');
+                }
+            });
+            
+            // Send message on Enter or button click
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addUserMessage(message);
+                    userInput.value = '';
+                    simulateQuantumProcessing(message);
+                }
+            }
+            
+            sendButton.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Add user message to chat
+            function addUserMessage(message) {
+                // Clear all messages including welcome
+                const messages = document.querySelectorAll('#chatContainer > div');
+                messages.forEach(msg => msg.remove());
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-enter mb-4 flex justify-center w-full max-w-2xl';
+                messageDiv.innerHTML = `
+                    <div class="w-full p-3 bg-green-900/20 border border-green-700/50 rounded-lg hidden">
+                        <p class="text-center">${message}</p>
+                    </div>
+                `;
+                chatContainer.appendChild(messageDiv);
+            }
+            
+            // Add bot message to chat
+            function addBotMessage(message, isProcessing = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message-enter mb-6 w-full max-w-2xl ${isProcessing ? 'opacity-90' : ''}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                            <i class="fas ${isProcessing ? 'fa-cog fa-spin' : 'fa-atom'} text-green-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-green-300">Quantizer</p>
+                            <div class="text-sm">
+                                ${message}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                chatContainer.appendChild(messageDiv);
+            }
+            
+            function simulateQuantumProcessing(question) {
+                // Create progress container
+                const progressContainer = document.createElement('div');
+                progressContainer.className = 'progress-container';
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressContainer.appendChild(progressBar);
+
+                // Create processing message
+                const processingMessage = document.createElement('div');
+                processingMessage.className = 'text-xs text-green-300 mb-2';
+
+                // Add to chat
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-enter mb-6 opacity-90 w-full max-w-2xl';
+                messageDiv.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                            <i class="fas fa-cog fa-spin text-green-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-bold text-green-300">Quantum Universe</p>
+                            <div class="text-sm"></div>
+                        </div>
+                    </div>
+                `;
+                // Append progress container and message to the messageDiv
+                const textContainer = messageDiv.querySelector('.text-sm');
+                textContainer.appendChild(progressContainer);
+                textContainer.appendChild(processingMessage);
+
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                // Quantum processing steps with detailed messages
+                const processingSteps = {
+                    en: [
+                        { progress: 5, message: "Initializing quantum processor..." },
+                        { progress: 10, message: "Calibrating qubits..." },
+                        { progress: 20, message: "Establishing quantum entanglement..." },
+                        { progress: 30, message: "Loading quantum algorithm..." },
+                        { progress: 40, message: "Executing quantum gates..." },
+                        { progress: 50, message: "Measuring quantum states..." },
+                        { progress: 60, message: "Correcting quantum errors..." },
+                        { progress: 70, message: "Analyzing probability amplitudes..." },
+                        { progress: 80, message: "Resolving quantum decoherence..." },
+                        { progress: 90, message: "Finalizing calculations..." },
+                        { progress: 95, message: "Verifying results..." },
+                        { progress: 100, message: "Quantum computation complete!" }
+                    ],
+                    ru: [
+                        { progress: 5, message: "Инициализация квантового процессора..." },
+                        { progress: 10, message: "Калибровка кубитов..." },
+                        { progress: 20, message: "Установка квантовой запутанности..." },
+                        { progress: 30, message: "Загрузка квантового алгоритма..." },
+                        { progress: 40, message: "Выполнение квантовых гейтов..." },
+                        { progress: 50, message: "Измерение квантовых состояний..." },
+                        { progress: 60, message: "Коррекция квантовых ошибок..." },
+                        { progress: 70, message: "Анализ амплитуд вероятностей..." },
+                        { progress: 80, message: "Разрешение квантовой декогеренции..." },
+                        { progress: 90, message: "Завершение расчетов..." },
+                        { progress: 95, message: "Проверка результатов..." },
+                        { progress: 100, message: "Квантовые вычисления завершены!" }
+                    ]
+                };
+
+                // Simulate detailed quantum processing with smooth progress
+                const processingTime = Math.random() * 7000 + 3000;
+                let startTime = Date.now();
+                let lastStep = 0;
+
+                const updateProgress = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(100, (elapsed / processingTime) * 100);
+                    progressBar.style.width = `${progress}%`;
+
+                    // Update processing message based on progress
+                    const steps = processingSteps[currentLang];
+                    const currentStepIndex = Math.min(
+                        steps.length - 1,
+                        Math.floor(progress / (100 / steps.length))
+                    );
+
+                    if (currentStepIndex !== lastStep) {
+                        processingMessage.textContent = steps[currentStepIndex].message;
+                        lastStep = currentStepIndex;
+                    }
+
+                    if (progress < 100) {
+                        requestAnimationFrame(updateProgress);
+                    } else {
+                        generateQuantumResponse(question);
+                    }
+                };
+
+                updateProgress();
+            }
+            
+            // Generate random quantum response
+            function generateQuantumResponse(question) {
+                // Generate random probability (0.01 to 98.9)
+                const probability = (Math.random() * 98.89 + 0.01).toFixed(2);
+                
+                // Scientific explanations
+                const explanations = {
+                    en: [
+                        `The quantum probability amplitude yielded a result of ${probability}% after accounting for decoherence effects in the qubit array.`,
+                        `Our analysis of the wavefunction collapse indicates a ${probability}% probability, factoring in Heisenberg uncertainty at the measurement boundary.`,
+                        `The quantum Fourier transform revealed a probability of ${probability}% when accounting for entanglement with the zero-point field.`,
+                        `After solving the Schrödinger equation for this scenario, we observe a ${probability}% probability amplitude in the favored eigenstate.`
+                    ],
+                    ru: [
+                        `Амплитуда квантовой вероятности дала результат ${probability}% после учета эффектов декогеренции в массиве кубитов.`,
+                        `Наш анализ коллапса волновой функции указывает на вероятность ${probability}% с учетом принципа неопределенности Гейзенберга на границе измерения.`,
+                        `Квантовое преобразование Фурье выявило вероятность ${probability}% при учете запутанности с полем нулевых колебаний.`,
+                        `После решения уравнения Шрёдингера для данного сценария мы наблюдаем амплитуду вероятности ${probability}% в предпочтительном собственном состоянии.`
+                    ]
+                };
+                
+                const technicalDetails = {
+                    en: [
+                        "Quantum decoherence time: 2.7μs",
+                        "Qubit fidelity: 99.4%",
+                        "Error correction cycles: 128",
+                        "Entanglement depth: 17 qubits",
+                        "Coherence time: 53μs",
+                        "Gate error rate: 0.12%"
+                    ],
+                    ru: [
+                        "Время квантовой декогеренции: 2.7μs",
+                        "Верность кубитов: 99.4%",
+                        "Циклы коррекции ошибок: 128",
+                        "Глубина запутанности: 17 кубитов",
+                        "Время когерентности: 53μs",
+                        "Частота ошибок гейтов: 0.12%"
+                    ]
+                };
+                
+                // Select random explanation and details
+                const explanation = explanations[currentLang][Math.floor(Math.random() * explanations[currentLang].length)];
+                const details = [];
+                for (let i = 0; i < 3; i++) {
+                    const randomDetail = technicalDetails[currentLang][Math.floor(Math.random() * technicalDetails[currentLang].length)];
+                    if (!details.includes(randomDetail)) {
+                        details.push(randomDetail);
+                    }
+                }
+                
+                // Format the response
+                const response = `
+                    <div class="p-3 bg-green-900/10 border border-green-800/50 rounded mb-3">
+                        <p class="text-sm text-green-300 mb-2">Question: "${question}"</p>
+                        <p class="font-bold text-lg glow-text mb-1">${probability}% probability</p>
+                        <p class="mb-2">${explanation}</p>
+                        <div class="text-xs text-green-300/80 space-y-1">
+                            ${details.map(d => `<p>• ${d}</p>`).join('')}
+                        </div>
+                    </div>
+                    <p class="text-xs text-green-400/70">
+                        ${currentLang === 'en' 
+                            ? 'Quantum analysis completed at ' + new Date().toLocaleTimeString() 
+                            : 'Квантовый анализ завершен в ' + new Date().toLocaleTimeString()}
+                    </p>
+                `;
+                
+                // Remove processing message and add final response
+                const messages = document.querySelectorAll('#chatContainer > div');
+                messages[messages.length - 1].remove();
+                addBotMessage(response);
+                // No need for additional scroll here as addBotMessage already handles it
+            }
+            
+            // Initial animation
+            setTimeout(() => {
+                const welcomeMessage = document.querySelector('#chatContainer > div');
+                welcomeMessage.classList.add('message-enter');
+            }, 100);
+        });
+    </script>
+<p style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo" style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;" target="_blank" >DeepSite</a> - 🧬 <a href="https://enzostvs-deepsite.hf.space?remix=dahaky/quantum-probability-calcculator" style="color: #fff;text-decoration: underline;" target="_blank" >Remix</a></p></body>
+</html>
